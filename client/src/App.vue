@@ -10,8 +10,8 @@ import { RouterLink, RouterView } from "vue-router";
 
 <style>
 html,
-body {
+body,
+#app {
   background-color: var(--bs-dark);
-  color: var(--bs-light);
 }
 </style>
