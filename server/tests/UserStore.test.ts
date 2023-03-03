@@ -39,5 +39,40 @@ test("Should update User", async () => {
     password: "aabbccdd",
   });
 
-  await expect(UserStore.Update(ctx, ""))
+  await expect(
+    UserStore.Update(ctx, {
+      id: 1,
+      name: "New Name",
+      email: "new@test.com",
+      password: "aabbccdd",
+      type: 1,
+    })
+  ).resolves.toEqual({
+    id: 1,
+    name: "New Name",
+    email: "new@test.com",
+    type: 1,
+  });
 });
+
+test("Correct ID should return User", async () => {
+  mockCtx.prisma.user.findUnique.mockResolvedValue({
+    id: 1,
+    name: "Test McTestface",
+    email: "test@test.com",
+    password: "abcdefg",
+    type: 0,
+  });
+
+  await expect(UserStore.GetByID(ctx, 1)).resolves.toEqual({
+    id: 1,
+    name: "Test McTestface",
+    email: "test@test.com",
+    type: 0,
+  });
+});
+
+test("Incorrect ID should return null", async () => {
+    mockCtx.prisma.user.findUnique.mockResolvedValue(null);
+    await expect(UserStore.GetByID(ctx, 2)).resolves.toEqual(null);
+  });
