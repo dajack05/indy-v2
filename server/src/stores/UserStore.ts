@@ -1,6 +1,6 @@
 import { Context } from "../Context";
 
-type User = {
+export type User = {
   id: number;
   email: string;
   name: string;
@@ -15,18 +15,22 @@ export interface UpdateUserParams {
   type?: number;
 }
 
+export interface CreateUserParams {
+  name?: string;
+  email: string;
+  password: string;
+}
+
 export class UserStore {
   static async Create(
     ctx: Context,
-    email: string,
-    password: string,
-    name: string
+    params: CreateUserParams
   ): Promise<User> {
     const created_user = await ctx.prisma.user.create({
       data: {
-        email,
-        password,
-        name,
+        email: params.email,
+        password: params.password,
+        name: params.name,
       },
     });
 
@@ -53,6 +57,20 @@ export class UserStore {
 
   static async GetByID(ctx: Context, id: number): Promise<User | null> {
     const user = await ctx.prisma.user.findUnique({ where: { id } });
+    if (user === null) {
+      return null;
+    } else {
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name || "",
+        type: user.type,
+      };
+    }
+  }
+
+  static async GetByEmail(ctx: Context, email: string): Promise<User | null> {
+    const user = await ctx.prisma.user.findUnique({ where: { email } });
     if (user === null) {
       return null;
     } else {

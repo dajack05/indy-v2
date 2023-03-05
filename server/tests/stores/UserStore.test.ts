@@ -1,6 +1,6 @@
 import { User } from ".prisma/client";
-import { Context, createMockContext, MockContext } from "../src/Context";
-import { UserStore } from "../src/stores/UserStore";
+import { Context, createMockContext, MockContext } from "../../src/Context";
+import { UserStore } from "../../src/stores/UserStore";
 
 let mockCtx: MockContext;
 let ctx: Context;
@@ -21,7 +21,7 @@ test("Should create User", async () => {
   mockCtx.prisma.user.create.mockResolvedValue(user);
 
   await expect(
-    UserStore.Create(ctx, "test@test.com", "abcdefg", "Test McTesterson")
+    UserStore.Create(ctx, { email: "test@test.com", password: "abcdefg", name: "Test McTesterson" })
   ).resolves.toEqual({
     id: 1,
     email: "test@test.com",
@@ -73,6 +73,28 @@ test("Correct ID should return User", async () => {
 });
 
 test("Incorrect ID should return null", async () => {
-    mockCtx.prisma.user.findUnique.mockResolvedValue(null);
-    await expect(UserStore.GetByID(ctx, 2)).resolves.toEqual(null);
+  mockCtx.prisma.user.findUnique.mockResolvedValue(null);
+  await expect(UserStore.GetByID(ctx, 2)).resolves.toEqual(null);
+});
+
+test("Correct Email should return User", async () => {
+  mockCtx.prisma.user.findUnique.mockResolvedValue({
+    id: 1,
+    name: "Test McTestface",
+    email: "test@test.com",
+    password: "abcdefg",
+    type: 0,
   });
+
+  await expect(UserStore.GetByEmail(ctx, "test@test.com")).resolves.toEqual({
+    id: 1,
+    name: "Test McTestface",
+    email: "test@test.com",
+    type: 0,
+  });
+});
+
+test("Incorrect ID should return null", async () => {
+  mockCtx.prisma.user.findUnique.mockResolvedValue(null);
+  await expect(UserStore.GetByEmail(ctx, "abcd")).resolves.toEqual(null);
+});
