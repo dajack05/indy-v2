@@ -1,9 +1,10 @@
 import { PrismaClient } from "@prisma/client"
 import {mockDeep} from "jest-mock-extended"
+import env from "dotenv"
 
 export function makeDataSource(){
-    console.log(process.env.DATABASE_URL);
-    return new PrismaClient();
+    env.config();
+    return new PrismaClient({datasources:{db:{url:process.env.DATABASE_URL}}});
 }
 
 export function makeMockDataSource(){
