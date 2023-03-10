@@ -132,28 +132,45 @@ describe("POST /driver", () => {
 
 describe("GET /driver", () => {
 
-    test("Should return 200", async () => {
-        mockDataStore.drivers.getAll.mockResolvedValue([]);
-        const response = await supertest(app).get("/driver").send();
-        expect(response.statusCode).toBe(200);
+    describe("Get All", () => {
+
+        test("Should return 200", async () => {
+            mockDataStore.drivers.getAll.mockResolvedValue([]);
+            const response = await supertest(app).get("/driver").send();
+            expect(response.statusCode).toBe(200);
+        })
+
+        test("Should return json", async () => {
+            mockDataStore.drivers.getAll.mockResolvedValue([]);
+            const response = await supertest(app).get("/driver").send();
+            expect(response.headers["content-type"]).toEqual(expect.stringContaining("json"));
+        })
+
+        test("Should return all drivers", async () => {
+            const all_drivers: Driver[] = [
+                { id: 0, name: "Fake Name 1", photo_url: "Fake Photo 1" },
+                { id: 1, name: "Fake Name 2", photo_url: "Fake Photo 2" },
+                { id: 2, name: "Fake Name 3", photo_url: "Fake Photo 3" },
+                { id: 3, name: "Fake Name 4", photo_url: "Fake Photo 4" },
+            ];
+            mockDataStore.drivers.getAll.mockResolvedValue(all_drivers);
+            const response = await supertest(app).get("/driver").send();
+            expect(response.body.drivers).toStrictEqual(all_drivers);
+        })
+
     })
 
-    test("Should return json", async () => {
-        mockDataStore.drivers.getAll.mockResolvedValue([]);
-        const response = await supertest(app).get("/driver").send();
-        expect(response.headers["content-type"]).toEqual(expect.stringContaining("json"));
-    })
+    describe("Get by ID", () => {
 
-    test("Should return all drivers", async () => {
-        const all_drivers: Driver[] = [
-            { id: 0, name: "Fake Name 1", photo_url: "Fake Photo 1" },
-            { id: 1, name: "Fake Name 2", photo_url: "Fake Photo 2" },
-            { id: 2, name: "Fake Name 3", photo_url: "Fake Photo 3" },
-            { id: 3, name: "Fake Name 4", photo_url: "Fake Photo 4" },
-        ];
-        mockDataStore.drivers.getAll.mockResolvedValue(all_drivers);
-        const response = await supertest(app).get("/driver").send();
-        expect(response.body.drivers).toStrictEqual(all_drivers);
+        test("Should return 400 if invalid id", async () => {
+            mockDataStore.drivers.getByID.mockResolvedValue(null);
+            const response = await supertest(app).get("/driver").send({ id: 123 });
+            expect(response.statusCode).toBe(400);
+        })
+
+        // Should NOT be array
+        // ID should be a number
+
     })
 
 })

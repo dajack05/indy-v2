@@ -43,8 +43,20 @@ export default function (store: DataStore) {
     });
 
     app.get("/driver", async (req, res) => {
-        const drivers = await store.drivers.getAll();
-        res.send({ drivers });
+        const { id } = req.body;
+        if (id) {
+            // Get By ID
+            const driver = await store.drivers.getByID(id);
+            if(!driver){
+                res.sendStatus(400);
+                return;
+            }
+
+            return driver;
+        } else {
+            const drivers = await store.drivers.getAll();
+            res.send({ drivers });
+        }
     });
 
     return app;
