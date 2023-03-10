@@ -1,11 +1,10 @@
 import makeApp from "./App"
-import { makeDataSource } from "./stores/DataSource";
-import UserStore from "./stores/UserStore";
+import { makeDataSource, makeDataStore } from "./stores/DataSource";
 
 const PORT = process.env.PORT || 8081;
 
 const dataSource = makeDataSource();
-const userStore = new UserStore(dataSource);
-const app = makeApp(userStore);
+const dataStore = makeDataStore(dataSource);
+const app = makeApp(dataStore);
 
 app.listen(PORT, () => console.log(`Server Started on port ${PORT}`));

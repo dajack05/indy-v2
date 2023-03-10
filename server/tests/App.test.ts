@@ -1,17 +1,15 @@
 import supertest from "supertest"
+import { DeepMockProxy, mockDeep } from 'jest-mock-extended'
+import { DataStore } from "../src/stores/DataSource"
 import makeApp from "../src/App"
-import UserStore from "../src/stores/UserStore"
 
-const mockCreateUser = jest.fn();
-
-const app = makeApp({
-    create: mockCreateUser,
-} as unknown as UserStore);
+let mockDataStore: DeepMockProxy<DataStore> = mockDeep<DataStore>();
+const app = makeApp(mockDataStore);
 
 describe("POST /users", () => {
 
     beforeEach(() => {
-        mockCreateUser.mockReset();
+        jest.clearAllMocks();
     })
 
     describe("Given a username and password", () => {
@@ -24,21 +22,21 @@ describe("POST /users", () => {
             ]
 
             for (const combo of combos) {
-                mockCreateUser.mockReset();
+                mockDataStore.users.create.mockReset();
 
                 const response = await supertest(app).post("/user").send(combo);
 
-                expect(mockCreateUser.mock.calls.length).toBe(1);
-                expect(mockCreateUser.mock.calls[0][0]).toBe(combo.email);
-                expect(mockCreateUser.mock.calls[0][1]).toBe(combo.password);
-                expect(mockCreateUser.mock.calls[0][2]).toBe(combo.name);
+                expect(mockDataStore.users.create.mock.calls.length).toBe(1);
+                expect(mockDataStore.users.create.mock.calls[0][0]).toBe(combo.email);
+                expect(mockDataStore.users.create.mock.calls[0][1]).toBe(combo.password);
+                expect(mockDataStore.users.create.mock.calls[0][2]).toBe(combo.name);
             }
         })
 
         test("Should return user with matching info", async () => {
 
             for (let i = 0; i < 10; i++) {
-                mockCreateUser.mockResolvedValue(i);
+                mockDataStore.users.create.mockResolvedValue(i);
 
                 const response = await supertest(app).post("/user").send({ email: "email", password: "password" });
 
@@ -67,7 +65,7 @@ describe("POST /users", () => {
         })
 
         test("Should return a user ID", async () => {
-            mockCreateUser.mockResolvedValue(1);
+            mockDataStore.users.create.mockResolvedValue(1);
 
             const response = await supertest(app).post("/user").send({
                 email: "email",

@@ -1,7 +1,7 @@
 import Express from 'express'
-import UserStore from './stores/UserStore';
+import { DataStore } from './stores/DataSource';
 
-export default function (database: UserStore) {
+export default function (store: DataStore) {
 
     const app = Express();
 
@@ -19,7 +19,7 @@ export default function (database: UserStore) {
             return;
         }
 
-        const userId = await database.create(email, password, name);
+        const userId = await store.users.create(email, password, name);
 
         res.send({ userId });
     });
