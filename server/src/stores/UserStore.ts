@@ -1,4 +1,4 @@
-import { Context } from "../Context";
+import { PrismaClient } from "@prisma/client";
 
 export type User = {
   id: number;
@@ -21,29 +21,27 @@ export interface CreateUserParams {
   password: string;
 }
 
-export class UserStore {
-  static async Create(
-    ctx: Context,
-    params: CreateUserParams
-  ): Promise<User> {
-    const created_user = await ctx.prisma.user.create({
+export default class UserStore {
+  private prisma = new PrismaClient();
+
+  async create(
+    email: string,
+    password: string,
+    name?: string
+  ): Promise<number> {
+    const created_user = await this.prisma.user.create({
       data: {
-        email: params.email,
-        password: params.password,
-        name: params.name,
+        email,
+        password,
+        name,
       },
     });
 
-    return {
-      id: created_user.id,
-      email: created_user.email,
-      name: created_user.name || "",
-      type: created_user.type,
-    };
+    return created_user.id;
   }
 
-  static async Update(ctx: Context, params: UpdateUserParams): Promise<User> {
-    const updated_user = await ctx.prisma.user.update({
+  async update(params: UpdateUserParams): Promise<User> {
+    const updated_user = await this.prisma.user.update({
       where: { id: params.id },
       data: params,
     });
@@ -55,8 +53,8 @@ export class UserStore {
     };
   }
 
-  static async GetByID(ctx: Context, id: number): Promise<User | null> {
-    const user = await ctx.prisma.user.findUnique({ where: { id } });
+  async getByID(id: number): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
     if (user === null) {
       return null;
     } else {
@@ -69,8 +67,8 @@ export class UserStore {
     }
   }
 
-  static async GetByEmail(ctx: Context, email: string): Promise<User | null> {
-    const user = await ctx.prisma.user.findUnique({ where: { email } });
+  async getByEmail(email: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
     if (user === null) {
       return null;
     } else {

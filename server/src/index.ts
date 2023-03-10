@@ -1,14 +1,9 @@
-import Express from "express";
-import { UserHandlers } from "./handlers/UserHandlers";
-
-const app = Express();
+import makeApp from "./App"
+import UserStore from "./stores/UserStore";
 
 const PORT = process.env.PORT || 8081;
 
-app.get("/", (req, res) => {
-    res.send("<h1>Are you supposed to be here?</h1>");
-});
-
-app.get("/user", UserHandlers.GetUserByID);
+const userStore = new UserStore();
+const app = makeApp(userStore);
 
 app.listen(PORT, () => console.log(`Server Started on port ${PORT}`));
