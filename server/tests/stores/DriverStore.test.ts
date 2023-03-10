@@ -1,7 +1,7 @@
 import { PrismaClient, Driver as DBDriver } from "@prisma/client";
 import { makeMockDataSource } from "../../src/stores/DataSource";
 import { DeepMockProxy } from "jest-mock-extended";
-import { DriverStore } from "../../src/stores/DriverStore";
+import { Driver, DriverStore } from "../../src/stores/DriverStore";
 
 let prisma: DeepMockProxy<PrismaClient>;
 let store: DriverStore;
@@ -62,7 +62,7 @@ describe("DriverStore -> Prisma", () => {
             expect(result).toStrictEqual({
                 id: 0,
                 name,
-                photo_url:""
+                photo_url: ""
             });
         })
 
@@ -72,6 +72,38 @@ describe("DriverStore -> Prisma", () => {
             const result = await store.getByID(0);
 
             expect(result).toBeNull();
+        })
+
+    })
+
+    describe("Get All Drivers", () => {
+
+        test("Should return an array", async () => {
+            prisma.driver.findMany.mockResolvedValue([]);
+            const result = await store.getAll();
+            expect(Array.isArray(result)).toBeTruthy();
+        })
+
+        test("Should return all Drivers", async () => {
+            const genDriver = (pos: number): DBDriver => ({ id: pos, name: `Name ${pos}`, photo_url: `Photo ${pos}`, draftOrderId: null, raceId: null });
+            const driverCount = 7;
+            const all_drivers: DBDriver[] = [];
+            const expected_drivers: Driver[] = [];
+            for (let i = 0; i < driverCount; i++) {
+                const d = genDriver(i);
+                all_drivers.push(d);
+                expected_drivers.push({
+                    id: d.id,
+                    name: d.name,
+                    photo_url: d.photo_url,
+                });
+            }
+            prisma.driver.findMany.mockResolvedValue(all_drivers);
+
+            const result = await store.getAll();
+
+            expect(result.length).toBe(driverCount);
+            expect(result).toStrictEqual(expected_drivers);
         })
 
     })

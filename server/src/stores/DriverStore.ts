@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Driver as DBDriver } from "@prisma/client";
 
 export type Driver = {
     id: number;
@@ -45,5 +45,11 @@ export class DriverStore {
         } else {
             return null;
         }
+    }
+
+    async getAll(): Promise<Driver[]> {
+        const drivers:DBDriver[] = await this.prisma.driver.findMany();
+        const mapped_drivers = drivers.map(d => ({ id: d.id, name: d.name, photo_url: d.photo_url } as Driver));
+        return mapped_drivers;
     }
 }

@@ -24,5 +24,28 @@ export default function (store: DataStore) {
         res.send({ userId });
     });
 
+    app.post("/driver", async (req, res) => {
+        const { name, photo_url } = req.body;
+
+        if (!name || typeof (name) != "string") {
+            res.sendStatus(400);
+            return;
+        }
+
+        const driverId = await store.drivers.create(name, photo_url || "");
+
+        if (driverId < 0) {
+            res.sendStatus(400);
+            return;
+        }
+
+        res.send({ driverId });
+    });
+
+    app.get("/driver", async (req, res) => {
+        const drivers = await store.drivers.getAll();
+        res.send({ drivers });
+    });
+
     return app;
 }
