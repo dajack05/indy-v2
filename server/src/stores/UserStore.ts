@@ -14,11 +14,7 @@ export default class UserStore {
     this.prisma = prisma;
   }
 
-  async create(
-    email: string,
-    password: string,
-    name?: string
-  ): Promise<number> {
+  async create(email: string, password: string, name?: string): Promise<number> {
 
     if (email.length == 0 || password.length == 0) {
       return -1;

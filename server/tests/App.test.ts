@@ -1,6 +1,6 @@
 import supertest from "supertest"
 import makeApp from "../src/App"
-import UserStore, { CreateUserParams, User } from "../src/stores/UserStore"
+import UserStore from "../src/stores/UserStore"
 
 const mockCreateUser = jest.fn();
 
