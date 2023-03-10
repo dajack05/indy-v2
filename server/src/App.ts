@@ -43,16 +43,22 @@ export default function (store: DataStore) {
     });
 
     app.get("/driver", async (req, res) => {
-        const { id } = req.body;
+        const { id } = req.query;
         if (id) {
-            // Get By ID
-            const driver = await store.drivers.getByID(id);
-            if(!driver){
+            const id_num = Number.parseInt(id.toString());
+            if (isNaN(id_num)) {
                 res.sendStatus(400);
                 return;
             }
 
-            return driver;
+            // Get By ID
+            const driver = await store.drivers.getByID(id_num);
+            if (!driver) {
+                res.sendStatus(400);
+                return;
+            }
+
+            res.send(driver);
         } else {
             const drivers = await store.drivers.getAll();
             res.send({ drivers });

@@ -164,12 +164,21 @@ describe("GET /driver", () => {
 
         test("Should return 400 if invalid id", async () => {
             mockDataStore.drivers.getByID.mockResolvedValue(null);
-            const response = await supertest(app).get("/driver").send({ id: 123 });
+            const response = await supertest(app).get("/driver").query({ id: 123 });
             expect(response.statusCode).toBe(400);
         })
 
-        // Should NOT be array
-        // ID should be a number
+        test("Should NOT be array", async () => {
+            mockDataStore.drivers.getByID.mockResolvedValue({ id: 2, name: "name", photo_url: "Photo" });
+            const response = await supertest(app).get("/driver").query({ id: 123 });
+            expect(Array.isArray(response.body)).toBeFalsy();
+        })
+
+        test("Invalid ID should return 400", async () => {
+            mockDataStore.drivers.getByID.mockResolvedValue({ id: 2, name: "name", photo_url: "Photo" });
+            const response = await supertest(app).get("/driver").query({ id: "abc" });
+            expect(response.statusCode).toBe(400);
+        })
 
     })
 

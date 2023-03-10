@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon ./src/index.ts",
     "start": "ts-node .",
-    "test": "jest"
+    "test": "jest --watchAll"
   },
   "author": "Daniel Jackson <dajack05@gmail.com>",
   "license": "ISC",
