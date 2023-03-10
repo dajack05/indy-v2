@@ -37,11 +37,13 @@ describe("POST /users", () => {
 
         test("Should return user with matching info", async () => {
 
-            mockCreateUser.mockResolvedValue(1);
-            
-            const response = await supertest(app).post("/user").send({ email:"email", password:"password" });
+            for (let i = 0; i < 10; i++) {
+                mockCreateUser.mockResolvedValue(i);
 
-            expect(response.body.userId).toBe(1);
+                const response = await supertest(app).post("/user").send({ email: "email", password: "password" });
+
+                expect(response.body.userId).toBe(i);
+            }
         })
 
         test("Should return status 200", async () => {
@@ -66,7 +68,7 @@ describe("POST /users", () => {
 
         test("Should return a user ID", async () => {
             mockCreateUser.mockResolvedValue(1);
-            
+
             const response = await supertest(app).post("/user").send({
                 email: "email",
                 password: "password",

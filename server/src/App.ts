@@ -19,11 +19,9 @@ export default function (database: UserStore) {
             return;
         }
 
-        const userId = await database.create( email, password, name);
+        const userId = await database.create(email, password, name);
 
-        res.send({
-            userId:userId,
-        });
+        res.send({ userId });
     });
 
     return app;
